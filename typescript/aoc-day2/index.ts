@@ -27,8 +27,6 @@ enum GameResults {
 const findTournamentScore = (data: string) => {
   const rounds = data.split("\n")
 
-  console.log(rounds)
-
   const myOptionIndex = 2
   const elfOptionIndex = 0
 
