@@ -39,48 +39,96 @@ struct ReadDataFromInput readDataFromInput(FILE* fp, char* buff) {
 };
 
 struct CalculateElfCaloriesReturn calculateElfCalories(char* buff, int buffSize) {
-  int* currentCalory = malloc(1 * sizeof(int));
+  int currentCalory = 0;
+  char* calory = NULL;
+  int calorySize = 0;
   int* allCalories = NULL;
-  int* allCaloriesSize = malloc(1 * sizeof(int));
-  *allCaloriesSize = 0;
-  *currentCalory = 0;
+  int allCaloriesSize = 0;
 
   struct CalculateElfCaloriesReturn elfCaloriesReturn;
 
   for (int i = 0; i < buffSize; i++) {
     char currentChar = buff[i];
     
-    if (strcmp(&currentChar, "\n") && !strcmp(&buff[i + 1], "\n")) {
-      *allCaloriesSize = *allCaloriesSize + 1;
-      allCalories = realloc(allCalories, *allCaloriesSize * sizeof(int));
-      allCalories[*allCaloriesSize - 1] = *currentCalory;
+    if (currentChar == '\n' && buff[i + 1] == '\n') {
+      int caloryConverted = atoi(calory);
+      currentCalory = currentCalory + caloryConverted;
+
+      allCaloriesSize = allCaloriesSize + 1;
+      allCalories = realloc(allCalories, allCaloriesSize * sizeof(int));
+      allCalories[allCaloriesSize - 1] = currentCalory;
 
       currentCalory = 0;
+      calory = "";
+      calorySize = 0;
+      i = i + 2;
+      continue;
     }
 
-    int calory = currentChar - '0';
+    if (currentChar == '\n') {
+      int caloryConverted = atoi(calory);
 
-    int newCalories = *currentCalory + calory;
+      currentCalory = currentCalory + caloryConverted;
 
-    *currentCalory = newCalories;
+      calory = "";
+      calorySize = 0;
+      continue;
+    }
+
+    calorySize = calorySize + 1;
+    calory = realloc(calory, calorySize * sizeof(int));
+    calory[calorySize - 1] = currentChar; 
   }
   
   elfCaloriesReturn.allCalories = allCalories;
-  elfCaloriesReturn.allCaloriesSize = *allCaloriesSize;
+  elfCaloriesReturn.allCaloriesSize = allCaloriesSize;
 
   return elfCaloriesReturn;
 }
 
 int getTheHighestCalories(struct CalculateElfCaloriesReturn elfCaloriesReturn) {
-  int* highestCalories = malloc(1 * sizeof(int));
+  int highestCalories = 0;
+  int highestCaloriesIndex = 0;
+  int* topThreeCalories = malloc(3 * sizeof(int));
+  int topThreeCaloriesSize = 0;
 
-  for (int i = 0; i <= elfCaloriesReturn.allCaloriesSize; i++) {
-    if (*highestCalories < elfCaloriesReturn.allCalories[i]) {
-      *highestCalories = elfCaloriesReturn.allCalories[i];
+  int topThreeSum = 0;
+
+  int j = 0;
+
+  while(j < elfCaloriesReturn.allCaloriesSize) {
+    printf("%d", elfCaloriesReturn.allCalories[j]);
+    printf("%s", "\n\n");
+    if (topThreeCaloriesSize == 3) {
+      break;
+    }
+
+    if (topThreeCaloriesSize < 3 && j == elfCaloriesReturn.allCaloriesSize - 1) {
+      topThreeCalories[topThreeCaloriesSize] = elfCaloriesReturn.allCalories[highestCaloriesIndex]; 
+      elfCaloriesReturn.allCalories[highestCaloriesIndex] = 0;
+      highestCalories = 0;
+      highestCaloriesIndex = 0;
+      topThreeCaloriesSize = topThreeCaloriesSize + 1;
+      j = 0;
+      continue;
+    }
+    
+    if (highestCalories < elfCaloriesReturn.allCalories[j]) {
+      highestCalories = elfCaloriesReturn.allCalories[j];
+      highestCaloriesIndex = j;
+      j++;
+    } else {
+      j++;
     }
   }
 
-  return *highestCalories;
+  for (int k = 0; k < topThreeCaloriesSize; k++) {
+    topThreeSum = topThreeCalories[k] + topThreeSum;
+  }
+
+  free(topThreeCalories);
+
+  return topThreeSum;
 }
 
 int main() {
@@ -90,6 +138,10 @@ int main() {
   struct ReadDataFromInput readData = readDataFromInput(fp, buff);
 
   struct CalculateElfCaloriesReturn elfCaloriesReturn = calculateElfCalories(readData.buff, readData.buffSize);  
+
+  int highestCalories = getTheHighestCalories(elfCaloriesReturn);
+
+  printf("%d", highestCalories);
 
   return 0;
 }
