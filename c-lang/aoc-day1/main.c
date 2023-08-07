@@ -47,10 +47,10 @@ struct CalculateElfCaloriesReturn calculateElfCalories(char* buff, int buffSize)
 
   struct CalculateElfCaloriesReturn elfCaloriesReturn;
 
-  for (int i = 0; i < buffSize; i++) {
+  for (int i = 0; i <= buffSize; i++) {
     char currentChar = buff[i];
     
-    if (currentChar == '\n' && buff[i + 1] == '\n') {
+    if (currentChar == '\n' && buff[i + 1] == '\n' || currentChar == '\0') {
       int caloryConverted = atoi(calory);
       currentCalory = currentCalory + caloryConverted;
 
@@ -58,10 +58,11 @@ struct CalculateElfCaloriesReturn calculateElfCalories(char* buff, int buffSize)
       allCalories = realloc(allCalories, allCaloriesSize * sizeof(int));
       allCalories[allCaloriesSize - 1] = currentCalory;
 
-      currentCalory = 0;
-      calory = "";
+      free(calory);  
+      calory = NULL;
       calorySize = 0;
-      i = i + 2;
+      currentCalory = 0;
+      i = i + 1;
       continue;
     }
 
@@ -70,7 +71,8 @@ struct CalculateElfCaloriesReturn calculateElfCalories(char* buff, int buffSize)
 
       currentCalory = currentCalory + caloryConverted;
 
-      calory = "";
+      free(calory);
+      calory = NULL;
       calorySize = 0;
       continue;
     }
@@ -97,8 +99,6 @@ int getTheHighestCalories(struct CalculateElfCaloriesReturn elfCaloriesReturn) {
   int j = 0;
 
   while(j < elfCaloriesReturn.allCaloriesSize) {
-    printf("%d", elfCaloriesReturn.allCalories[j]);
-    printf("%s", "\n\n");
     if (topThreeCaloriesSize == 3) {
       break;
     }
@@ -142,6 +142,8 @@ int main() {
   int highestCalories = getTheHighestCalories(elfCaloriesReturn);
 
   printf("%d", highestCalories);
+
+  // Answer: 203905
 
   return 0;
 }
