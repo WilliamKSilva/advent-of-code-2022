@@ -33,13 +33,13 @@ struct String readInputText(FILE *file) {
   return fileData;
 }
 
-int compareRuckSackCompartments(struct String rucksack) {
+char compareRuckSackCompartments(struct String rucksack) {
   int firstHalfStart = 0;
   int secondHalfStart = (rucksack.size / 2) - 1;
 
-  int matchValue;
+  char matchValue;
 
-  for (int i = 0; i < secondHalfStart; i++) {
+  for (int i = 0; i <= secondHalfStart; i++) {
     int firstCompartmentValue = rucksack.content[i];
 
     for (int j = secondHalfStart + 1; j < rucksack.size; j++) {
@@ -54,9 +54,9 @@ int compareRuckSackCompartments(struct String rucksack) {
   return matchValue;
 }
 
-struct IntArray loopRuckSacks(struct String listItems) {
+struct String loopRuckSacks(struct String listItems) {
   struct String rucksack = {.size = 0, .content = NULL};
-  struct IntArray matchArray = {.size = 0, .content = NULL};
+  struct String matchArray = {.size = 0, .content = NULL};
 
   for (int i = 0; i < listItems.size; i++) {
     char currentChar = listItems.content[i];
@@ -65,15 +65,15 @@ struct IntArray loopRuckSacks(struct String listItems) {
     // printf("%s", "\n\n");
 
     if (currentChar == '\n') {
-      int matchValue = compareRuckSackCompartments(rucksack);
+      char matchValue = compareRuckSackCompartments(rucksack);
 
-      printf("%c", matchValue);
-      printf("%s", "\n\n");
+      // printf("%c", matchValue);
+      // printf("%s", "\n\n");
 
       matchArray.size = matchArray.size + 1;
 
       matchArray.content =
-          realloc(matchArray.content, matchArray.size * sizeof(int));
+          realloc(matchArray.content, matchArray.size * sizeof(char));
 
       matchArray.content[matchArray.size - 1] = matchValue;
 
@@ -82,6 +82,7 @@ struct IntArray loopRuckSacks(struct String listItems) {
       rucksack.content = NULL;
 
       continue;
+
     } else {
       rucksack.size = rucksack.size + 1;
 
@@ -97,7 +98,7 @@ struct IntArray loopRuckSacks(struct String listItems) {
   return matchArray;
 }
 
-int sumMatchValues(struct IntArray matchArray) {
+int sumMatchValues(struct String matchArray) {
   struct IntArray asciiValueArray = {.size = 0, .content = NULL};
   int sumValue = 0;
   int lowerCaseAscii = 96;
@@ -106,7 +107,12 @@ int sumMatchValues(struct IntArray matchArray) {
     int currentValue = matchArray.content[i];
     int asciiValue = (int)currentValue;
 
-    if (asciiValue < 97) {
+    // printf("%c", currentValue);
+    // printf("%s", "\n");
+    // printf("%d", asciiValue);
+    // printf("%s", "\n\n");
+
+    if (asciiValue < 97 && currentValue) {
       asciiValueArray.size = asciiValueArray.size + 1;
 
       asciiValueArray.content =
@@ -119,13 +125,15 @@ int sumMatchValues(struct IntArray matchArray) {
       continue;
     }
 
-    if (asciiValue >= 97) {
+    if (asciiValue >= 97 && currentValue) {
       asciiValueArray.size = asciiValueArray.size + 1;
 
       asciiValueArray.content =
           realloc(asciiValueArray.content, asciiValueArray.size * sizeof(int));
 
       int priorityValue = asciiValue - lowerCaseAscii;
+
+      // printf("%d", priorityValue);
 
       asciiValueArray.content[asciiValueArray.size - 1] = priorityValue;
 
@@ -153,7 +161,7 @@ int sumMatchValues(struct IntArray matchArray) {
 int main() {
   FILE *file = NULL;
   struct String fileData = readInputText(file);
-  struct IntArray matchArray = loopRuckSacks(fileData);
+  struct String matchArray = loopRuckSacks(fileData);
   int sumValue = sumMatchValues(matchArray);
 
   printf("%d", sumValue);
