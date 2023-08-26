@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <system_error>
 #include <vector>
 
 using namespace std;
@@ -98,7 +99,7 @@ vector<Section> readPairs(vector<string> &pairsString) {
 
       sectionValue.push_back(character);
 
-      if (i == firstSection.size() - 1) {
+      if (i == secondSection.size() - 1) {
         int convertedSectionValue = atoi(sectionValue.c_str());
         pair.end = convertedSectionValue;
         sectionValue = "";
@@ -119,7 +120,11 @@ int fullyContainsCount(const vector<Section> &sections) {
 
   for (auto const &section : sections) {
     Pair firstPair = section.first;
+    cout << firstPair.start << "\n";
+    cout << firstPair.end << "\n\n";
     Pair secondPair = section.second;
+    cout << secondPair.start << "\n";
+    cout << secondPair.end << "\n\n\n";
     vector<int> firstPairValues;
     vector<int> secondPairValues;
 
@@ -131,56 +136,36 @@ int fullyContainsCount(const vector<Section> &sections) {
       secondPairValues.push_back(i);
     }
 
-    if (firstPair.start == firstPair.end) {
-      firstPairValues.push_back(firstPair.start);
-    }
+    bool contains = false;
 
-    if (secondPair.start == secondPair.end) {
-      firstPairValues.push_back(secondPair.start);
-    }
-
-    bool contains = true;
-
-    if (firstPair.start < secondPair.start && firstPair.end >= secondPair.end) {
+    if (firstPair.start <= secondPair.start && firstPair.end >= secondPair.end) {
       for (int i = 0; i < secondPairValues.size(); i++) {
         int secondValue = secondPairValues[i];
-        int firstValue;
-        int firstValueAccumulator = 0;
-        while(firstValue != secondPairValues.back()) {
-          firstValue = firstPairValues[firstValueAccumulator]; 
+        for (int j = 0; firstPairValues[j] <= secondPair.end; j++) {
+          int firstValue = firstPairValues[j];
           if (firstValue < secondPair.start) {
-            firstValueAccumulator = firstValueAccumulator + 1;
-
             continue;
           }
 
-          if (firstValue != secondValue) {
-            contains = false;
-            i = secondPairValues.size();
-
+          if (firstValue == secondValue) {
+            contains = true;
             break;
           }
         }
       }
     }
 
-   if (secondPair.start < firstPair.start && secondPair.end >= firstPair.end) {
+    if (secondPair.start <= firstPair.start && secondPair.end >= firstPair.end) {
       for (int i = 0; i < firstPairValues.size(); i++) {
-        int secondValue = firstPairValues[i];
-        int firstValue;
-        int firstValueAccumulator = 0;
-        while(firstValue != firstPairValues.back()) {
-          firstValue = secondPairValues[firstValueAccumulator]; 
-          if (firstValue < secondPair.start) {
-            firstValueAccumulator = firstValueAccumulator + 1;
-
+        int firstValue = firstPairValues[i];
+        for (int j = 0; secondPairValues[j] <= firstPair.end; j++) {
+          int secondValue = secondPairValues[j];
+          if (secondValue < firstPair.start) {
             continue;
           }
 
-          if (firstValue != secondValue) {
-            contains = false;
-            i = secondPairValues.size();
-
+          if (secondValue == firstValue) {
+            contains = true;
             break;
           }
         }
@@ -188,7 +173,7 @@ int fullyContainsCount(const vector<Section> &sections) {
     }
 
     if (contains) {
-      fullyContains = fullyContains++;
+      fullyContains++;
     }
   }
 
@@ -205,7 +190,7 @@ int main() {
 
   int fullyContains = fullyContainsCount(sections);
 
-  cout << fullyContains;
+  cout << fullyContains << "\n";
 
   return 0;
 }
